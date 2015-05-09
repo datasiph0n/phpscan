@@ -1,5 +1,4 @@
 <?php
-
 (PHP_SAPI !== 'cli' || isset($_SERVER['HTTP_USER_AGENT'])) && die('cli only');
 
 $prefix = '$_';
@@ -28,7 +27,7 @@ class phpscan {
 							break;
 						}
 					}
-					if(preg_match("/=/", $line)) {
+					if(preg_match("/(.*)=(.*)" . ltrim($variable, '$_') . "/", $line)) {
 						$potential_variable = 1;
 					} else {
 						$potential_variable = 0;
@@ -39,18 +38,22 @@ class phpscan {
 		}
 		if($line_number) {
 			if($file_write == 1) {
+				$line = file($file);
+				$line = $line[$line_number-1];
 				$fh = fopen($outputfile, "a");
-				fwrite($fh, "Line:" . $line_number . " - Variable: " . $variable . "\n File: " . $file . "\n Secure: " . $secure_d . "\n Variable Check: " . $potential_variable . "\n--------------------------------------------------------------------------\n");
+				fwrite($fh, "Variable: " . $variable . "\n Line: " . $line_number . " " . $line . "\n File: " . $file . "\n Secure: " . $secure_d . "\n Variable Check: " . $potential_variable . "\n--------------------------------------------------------------------------\n");
 				fclose($fh);
 			} else { 
 				if($this->verbose == 1) {
 					if($potential_variable === 1 && $secure_d === 0) {
 						$line = file($file);
 						$line = $line[$line_number-1];
-						echo "Line:" . $line_number . " - Variable: " . $variable . "\n Line: " . $line . "\n File: " . $file . "\n Secure: " . $secure_d . "\n Variable Check: " . $potential_variable . "\n--------------------------------------------------------------------------\n";
+						echo "Variable: " . $variable . "\n Line: " . $line_number . " " . $line . "\n File: " . $file . "\n Secure: " . $secure_d . "\n Variable Check: " . $potential_variable . "\n--------------------------------------------------------------------------\n";
 					}
 				} else {
-					echo "Line:" . $line_number . " - Variable: " . $variable . "\n File: " . $file . "\n Secure: " . $secure_d . "\n Variable Check: " . $potential_variable . "\n--------------------------------------------------------------------------\n";
+					$line = file($file);
+					$line = $line[$line_number-1];
+					echo "Variable: " . $variable . "\n Line: " . $line_number . " " . $line . "\n File: " . $file . "\n Secure: " . $secure_d . "\n Variable Check: " . $potential_variable . "\n--------------------------------------------------------------------------\n";
 				}
 			}
 		}
