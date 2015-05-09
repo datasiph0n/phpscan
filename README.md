@@ -1,6 +1,10 @@
 # phpscan
 Lollipops - Simple yet effective PHP function scanner.
 
+http://siph0n.in
+
+
+
 Currently in semi-working order - nothing too heavy.
 
 $multi_array = array('GET', 'POST', 'COOKIE', 'REQUEST', 'SERVER', 'FILES', 'ENV', 'HTTP_COOKIE_VARS', 'HTTP_ENV_VARS', 'HTTP_GET_VARS', 'HTTP_POST_FILES', 'HTTP_POST_VARS', 'HTTP_SERVER_VARS');
