@@ -24,7 +24,6 @@ class phpscan {
 					foreach($secure as $a) {
 						if(preg_match("/".$a."/", $line)) {
 							$secure_d = 1;
-							break;
 						}
 					}
 					if(preg_match("/(.*)=(.*)" . ltrim($variable, '$_') . "/", $line)) {
