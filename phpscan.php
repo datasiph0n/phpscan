@@ -10,51 +10,38 @@ class phpscan {
 
 	public $searchterm;
 	public $verbose;
-
 	public function search_file($file, $variable, $file_write, $outputfile) {
-		$line_number = false;
-		$secure = array('htmlspecialchars', 'mysql_real_escape_string', 'htmlentities', 'escapeString');
+		$line_number = 0;
+		$count = 1;
+		$secure = array('htmlspecialchars', 'mysql_real_escape_string', 'htmlentities', 'escapeString', 'md5');
 		if($handle = fopen($file, "r")) {
-			$count = 0;
 			while(($line = fgets($handle, 4096)) !== FALSE and !$line_number) {
-				$count++;
-				$line_number = (strpos($line, $variable) !== FALSE) ? $count : $line_number;
+				$line_number = (strpos($line, $variable, 0) !== FALSE) ? $count : $line_number;
 				$secure_d = 0;
+				$potential_variable = 0;
 				if($line_number) {
 					foreach($secure as $a) {
 						if(preg_match("/".$a."/", $line)) {
 							$secure_d = 1;
 						}
 					}
-					if(preg_match("/(.*)=(.*)" . ltrim($variable, '$_') . "/", $line)) {
+					if(preg_match("/(.+?)=(.*)\\" . $variable . "/", $line)) {
 						$potential_variable = 1;
 					} else {
 						$potential_variable = 0;
 					}
-				}
-			}
-			fclose($handle);
-		}
-		if($line_number) {
-			if($file_write == 1) {
-				$line = file($file);
-				$line = $line[$line_number-1];
-				$fh = fopen($outputfile, "a");
-				fwrite($fh, "Variable: " . $variable . "\n Line: " . $line_number . " " . $line . "\n File: " . $file . "\n Secure: " . $secure_d . "\n Variable Check: " . $potential_variable . "\n--------------------------------------------------------------------------\n");
-				fclose($fh);
-			} else { 
-				if($this->verbose == 1) {
-					if($potential_variable === 1 && $secure_d === 0) {
-						$line = file($file);
-						$line = $line[$line_number-1];
+					if($this->verbose == 1) {
+						if($potential_variable === 1) {
+							echo "Variable: " . $variable . "\n Line: " . $line_number . " " . $line . "\n File: " . $file . "\n Secure: " . $secure_d . "\n Variable Check: " . $potential_variable . "\n--------------------------------------------------------------------------\n";
+						}
+					} else {
 						echo "Variable: " . $variable . "\n Line: " . $line_number . " " . $line . "\n File: " . $file . "\n Secure: " . $secure_d . "\n Variable Check: " . $potential_variable . "\n--------------------------------------------------------------------------\n";
 					}
-				} else {
-					$line = file($file);
-					$line = $line[$line_number-1];
-					echo "Variable: " . $variable . "\n Line: " . $line_number . " " . $line . "\n File: " . $file . "\n Secure: " . $secure_d . "\n Variable Check: " . $potential_variable . "\n--------------------------------------------------------------------------\n";
 				}
+				$line_number = 0;
+				$count++;
 			}
+			fclose($handle);
 		}
 	}
 
